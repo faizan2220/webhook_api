@@ -1,6 +1,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
+  annotations:
+    backstage.io/techdocs-ref: dir:.
   namespace: default
   name: Webhook
   description: The Webhook API
