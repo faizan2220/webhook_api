@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  namespace: default
+  name: Webhook
+  description: The Webhook API
+  tags:
+    - store
+    - rest
+spec:
+  type: openapi
+  lifecycle: production
+  owner: btiq
+  definition: 
+    $text: https://github.com/faizan2220/webhook_api/blob/main/webhook.yaml
