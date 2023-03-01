@@ -10,6 +10,6 @@ metadata:
 spec:
   type: openapi
   lifecycle: production
-  owner: btiq
+  owner: backstage
   definition: 
     $text: https://github.com/faizan2220/webhook_api/blob/main/webhook.yaml
