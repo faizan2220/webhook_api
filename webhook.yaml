@@ -1,0 +1,479 @@
+openapi: 3.0.1
+info:
+  title: Bottomline IQ Webhooks Service API
+  description: Bottomline IQ Webhooks Service Documentation
+  contact:
+    name: Bottomline
+    url: https://www.bottomline.com/us/support-services/contact-support
+  license:
+    name: Bottomline
+    url: https://www.bottomline.com
+  version: '1.0'
+servers:
+  - url: https://btiq-unstable.saas-n.com/webhooks
+    description: Generated server url
+tags:
+  - name: Webhook Controller
+    description: Set of endpoints for Webhook events.
+paths:
+  /webhooks/events:
+    post:
+      tags:
+        - Webhook Controller
+      description: Triggers a webhook event.
+      operationId: eventOccurs
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventModel'
+        required: true
+      responses:
+        '204':
+          description: The webhook event has been triggered successfully.
+        '400':
+          description: Validation failure. Body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+  /webhooks/subscriptions:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets all subscriptions for a tenant
+      operationId: getAllSubscriptions
+      parameters:
+        - name: page
+          in: query
+          description: Zero-based page index. Default 0.
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: Page size. Default 50.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: 'Sorting criteria in the format: property(,asc|desc). Valid sort property include: id, productId, url, updated, created. Multiple sort criteria are supported. Leaving out sort order defaults to asc (entering only ''id'' becomes ''id,asc''). Default is ''updated,desc''.'
+          schema:
+            type: array
+            items:
+              type: string
+          example: updated,desc
+      responses:
+        '200':
+          description: Successfully got subscriptions.
+        '400':
+          description: Validation failure. Parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+    post:
+      tags:
+        - Webhook Controller
+      description: 'Creating a new webhooks subscription. The retry parameters on the SubscriptionModel namely firstRetry, retry exponent, and maxRetries if used will be used in the exponential backoff between notification failures, following the algorithm: retryCount === 1 ? firstRetry : firstRetry * Math.pow(retryCount, retryExponent)'
+      operationId: newSubscription
+      parameters:
+        - name: X-Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionModel'
+        required: true
+      responses:
+        '200':
+          description: Subscription successful.
+        '400':
+          description: Validation failure. Body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+  /webhooks/subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets all information about a specific subscription
+      operationId: getBySubscriptionId
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A subscription is successfully returned.
+        '404':
+          description: Entity with id does not exist.
+    put:
+      tags:
+        - Webhook Controller
+      description: 'Updates a subscription. The retry parameters on the SubscriptionModel namely firstRetry, retry exponent, and maxRetries if used will be used in the exponential backoff between notification failures, following the algorithm: retryCount === 1 ? firstRetry : firstRetry * Math.pow(retryCount, retryExponent)'
+      operationId: updateSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionModel'
+        required: true
+      responses:
+        '200':
+          description: Update successful.
+        '400':
+          description: Validation failure. Body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+        '404':
+          description: Entity with id does not exist.
+    delete:
+      tags:
+        - Webhook Controller
+      description: Triggers an unsubscribe event.
+      operationId: unsubscribe
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Successfully Unsubscribed.
+        '404':
+          description: Entity with id does not exist.
+  /webhooks/subscriptions/{subscriptionId}/notifications:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets all notifications for a single subscription.
+      operationId: getAllNotificationsForSubscription
+      parameters:
+        - name: page
+          in: query
+          description: Zero-based page index. Default 0.
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: Page size. Default 50.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: 'Sorting criteria in the format: property(,asc|desc). Valid sort property include: id, httpCode, numRetries, updated, created, eventType. Multiple sort criteria are supported. Leaving out sort order defaults to asc (entering only ''id'' becomes ''id,asc''). Default is ''updated,desc''.'
+          schema:
+            type: array
+            items:
+              type: string
+          example: updated,desc
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully got notifications.
+        '400':
+          description: Validation failure. Parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+        '404':
+          description: Entity with id does not exist.
+  /webhooks/notifications/{notificationId}:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets all information about a specific notification
+      operationId: getByNotificationId
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A notification is successfully returned.
+        '404':
+          description: Entity with id does not exist.
+    post:
+      tags:
+        - Webhook Controller
+      description: Retries notification sending.
+      operationId: retryNotification
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Retry successful.
+        '404':
+          description: Entity with id does not exist.
+  /webhooks/subscriptions/{subscriptionId}/crc/status:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets information about Challenge Response Check status for a specific subscription
+      operationId: getCrcStatus
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: CRC status is successfully returned.
+        '404':
+          description: Subscription with id does not exist.
+  /webhooks/subscriptions/{subscriptionId}/crc:
+    get:
+      tags:
+        - Webhook Controller
+      description: Gets all Challenge Response Check history items for a single subscription.
+      operationId: getAllCrcHistory
+      parameters:
+        - name: page
+          in: query
+          description: Zero-based page index. Default 0.
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          description: Page size. Default 50.
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: 'Sorting criteria in the format: property(,asc|desc). Valid sort property include: date, status. Multiple sort criteria are supported. Leaving out sort order defaults to asc (entering only ''status'' becomes ''status,asc''). Default is ''date,desc''.'
+          schema:
+            type: array
+            items:
+              type: string
+          example: date,desc
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successfully got CRC history.
+        '400':
+          description: Validation failure. Parameters are invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example: |-
+                {
+                "type": "http://api.bottomline.com/errors/validation",
+                "title": "A bad input from the caller triggered a \"bad request\" response.",
+                "detail": "Invalid UUID specified for notificationId","status": 400,
+                }
+        '404':
+          description: Subscription with id does not exist.
+    post:
+      tags:
+        - Webhook Controller
+      description: Send Challenge Response Check
+      operationId: sendCrc
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '202':
+          description: CRC successfully being processed.
+        '404':
+          description: Entity with id does not exist.
+components:
+  schemas:
+    InvalidParam:
+      type: object
+      properties:
+        name:
+          type: string
+        reason:
+          type: string
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          type: integer
+          format: int32
+        instance:
+          type: string
+          format: uri
+        invalid-params:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvalidParam'
+    EventModel:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of Webhook.
+          example: EXAMPLE
+        payload:
+          type: string
+          description: json string from subscriber/LOB
+          example: '{}'
+        productId:
+          type: string
+          description: Product ID, unique to LOB
+          format: uuid
+        idempotencyRequestString:
+          type: string
+      description: Model representing an Event
+    SubscriptionModel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Subscription id
+        created:
+          type: string
+          format: date-time
+        url:
+          type: string
+          description: Subscribe to Webhooks
+          example: https://some-url/webhooks
+        firstRetry:
+          type: number
+          format: double
+          example: 30
+        retryExponent:
+          type: integer
+          format: int32
+          example: 4
+        maxRetries:
+          type: integer
+          format: int32
+          example: 4
+        b64EncodePayload:
+          type: boolean
+        nonRepudiationEnabled:
+          type: boolean
+        kid:
+          type: string
+          description: key id to identify the public key
+        events:
+          uniqueItems: true
+          type: array
+          description: List of subscribed event types
+          example:
+            - EXAMPLE
+          items:
+            type: string
+        tenantId:
+          type: string
+          description: Tenant ID, unique to LOB
+          format: uuid
+        productId:
+          type: string
+          description: Product ID, unique to LOB
+          format: uuid
+        updated:
+          type: string
+          format: date-time
+        secret:
+          type: string
+          description: Subscription secret, encrypted in database
+        idempotencyRequestString:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://api.bottomline.com/auth/realms/bottomline/protocol/openid-connect/token
+          scopes: {}
