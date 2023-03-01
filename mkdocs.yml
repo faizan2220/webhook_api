@@ -1,4 +1,4 @@
-site_name: 'Webhooks Api docs'
+site_name: 'Webhook'
 
 nav:
   - Home: index.md
