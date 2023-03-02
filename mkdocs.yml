@@ -2,6 +2,7 @@ site_name: 'Webhook'
 
 nav:
   - Home: index.md
+  - Webhooks: output.md
 
 plugins:
   - techdocs-core
