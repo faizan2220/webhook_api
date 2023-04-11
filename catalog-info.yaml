@@ -5,6 +5,8 @@ relations:
     targetRef: component:default/catstore
   - type: apiProvidedBy
     targetRef: component:default/bottomline
+  - type: apiProvidedBy
+    targetRef: component:default/saurabh
 metadata:
   annotations:
     backstage.io/techdocs-ref: dir:.
