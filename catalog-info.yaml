@@ -1,5 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: API
+relations:
+  - home: index.md
 metadata:
   annotations:
     backstage.io/techdocs-ref: dir:.
