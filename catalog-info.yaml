@@ -1,7 +1,6 @@
 apiVersion: backstage.io/v1alpha1
 kind: API
 relations:
-  - home: index.md
   - type: apiProvidedBy
     targetRef: component:default/catstore
 metadata:
