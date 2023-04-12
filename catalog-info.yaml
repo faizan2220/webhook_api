@@ -2,13 +2,7 @@ apiVersion: backstage.io/v1alpha1
 kind: API
 relations:
   - type: apiProvidedBy
-    targetRef: component:default/catstore
-  - type: apiProvidedBy
-    targetRef: component:default/bottomline
-  - type: apiProvidedBy
-    targetRef: component:default/saurabh
-  - type: apiProvidedBy
-    targetRef: component:default/habeeb
+    targetRef: component:default/petstore
 metadata:
   annotations:
     backstage.io/techdocs-ref: dir:.
