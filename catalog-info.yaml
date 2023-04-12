@@ -16,6 +16,12 @@ relations:
       kind: component
       namespace: default
       name: petstore
+  - type: ownedBy
+    targetRef: group:default/team-c
+    target:
+      kind: group
+      namespace: default
+      name: team-c
 spec:
   type: openapi
   lifecycle: production
