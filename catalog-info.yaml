@@ -9,6 +9,13 @@ metadata:
   tags:
     - store
     - rest
+relations:
+  - type: apiProvidedBy
+    targetRef: component:default/petstore
+    target:
+      kind: component
+      namespace: default
+      name: petstore
 spec:
   type: openapi
   lifecycle: production
