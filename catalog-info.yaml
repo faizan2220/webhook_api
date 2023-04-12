@@ -3,6 +3,8 @@ kind: API
 relations:
   - type: apiProvidedBy
     targetRef: component:default/petstore
+  - type: apiProvidedBy
+    targetRef: component:default/bottomline
 metadata:
   annotations:
     backstage.io/techdocs-ref: dir:.
