@@ -9,6 +9,8 @@ metadata:
   tags:
     - store
     - rest
+relations:
+  targetref: component/petstore
 spec:
   type: openapi
   lifecycle: production
