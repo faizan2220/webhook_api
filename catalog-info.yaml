@@ -10,7 +10,8 @@ metadata:
     - store
     - rest
 relations:
-  targetref: component/petstore
+  - type: apiProvidedBy
+    targetRef: component:default/petstore
 spec:
   type: openapi
   lifecycle: production
